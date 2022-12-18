@@ -79,12 +79,12 @@ EOF
 function init_master() {
     echo "init master"
     kubeadm init \
---apiserver-advertise-address= \
---control-plane-endpoint=master-cluod.hmc.com \
---image-repository registry.aliyuncs.com/google_containers \
---kubernetes-version v1.20.9 \
---service-cidr=10.96.1.0/24 \
---pod-network-cidr=10.98.1.0/24
+    --apiserver-advertise-address= \
+    --control-plane-endpoint=master-cluod.hmc.com \
+    --image-repository registry.aliyuncs.com/google_containers \
+    --kubernetes-version v1.20.9 \
+    --service-cidr=10.96.1.0/24 \
+    --pod-network-cidr=10.98.1.0/24
 }
 
 function join_cluster() {
