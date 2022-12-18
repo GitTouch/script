@@ -8,7 +8,7 @@ function system_init() {
          -i.bak \
          /etc/yum.repos.d/CentOS-Base.repo
         yum makecache && yum update -y
-        yum install net-tools lsof yum-utils device-mapper-persistent-data lvm2
+        yum install net-tools lsof yum-utils device-mapper-persistent-data lvm2 vim -y
         #配置docker源仓库
         yum-config-manager --add-repo https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
     fi
@@ -26,12 +26,13 @@ function install_docker() {
         yum remove docker* -y
     fi
     #安装docker
-    yum install -y docker-ce-19.03.9-3.el7 docker-ce-cli-19.03.9-3.el7 containerd.io
+    yum install -y docker-ce-19.03.9-3.el7 docker-ce-cli-19.03.9-3.el7 containerd.io -y
     #配置docker的镜像加速
     mkdir -p /etc/docker
     cat > /etc/docker/daemon.json <<-EOF
 {
-  "registry-mirrors": ["http://hub-mirror.c.163.com"]
+  "registry-mirrors": ["http://hub-mirror.c.163.com"],
+  "exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF
     #加载配置
@@ -72,7 +73,7 @@ EOF
 
     #所有机器配置master域名
     echo "`hostname -I|awk '{print$1}'` node`hostname|awk -F '-' '{print$3}'`-cloud.hmc.com" >> /etc/hosts
-    echo "`hostname` node`hostname|awk -F '-' '{print$3}'`-cloud.hmc.com" >> /etc/hosts
+    echo "`hostname -I|awk '{print$1}'` `hostname|tr [:upper:] [:lower:]`" >> /etc/hosts
 }
 
 system_init
