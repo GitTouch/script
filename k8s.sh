@@ -12,12 +12,11 @@ function system_init() {
         #配置docker源仓库
         yum-config-manager --add-repo https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
     fi
-
     #关闭SELinux
     if [[ "Enforcing" == `getenforce` ]]; then
         sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config && setenforce 0
     fi
-
+    #关闭并禁用防火墙
     systemctl stop firewalld && systemctl disable firewalld
 }
 
@@ -28,10 +27,8 @@ function install_docker() {
     fi
     #安装docker
     yum install -y docker-ce-19.03.9-3.el7 docker-ce-cli-19.03.9-3.el7 containerd.io
-    #配置开机启动且立即启动docker
-    systemctl enable docker --now
+    #配置docker的镜像加速
     mkdir -p /etc/docker
-     #配置docker的镜像加速
     cat > /etc/docker/daemon.json <<-EOF
 {
   "registry-mirrors": ["http://hub-mirror.c.163.com"]
@@ -39,8 +36,8 @@ function install_docker() {
 EOF
     #加载配置
     systemctl daemon-reload
-    #重启docker
-    systemctl restart docker
+    #启动docker并配置开机启动
+    systemctl enable docker --now
     if [[ -n `docker version` ]]; then
         echo "docker installed successful"
     fi
@@ -74,7 +71,7 @@ EOF
     systemctl enable kubelet --now
 
     #所有机器配置master域名
-    echo "`hostname -I|awk '{print$1}'` master-cloud.hmc.com" >> /etc/hosts
+    echo "`hostname -I|awk '{print$1}'` node`hostname|awk -F '-' '{print$3}'`-cloud.hmc.com" >> /etc/hosts
     echo "`hostname` node`hostname|awk -F '-' '{print$3}'`-cloud.hmc.com" >> /etc/hosts
 }
 
