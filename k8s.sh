@@ -17,6 +17,8 @@ function system_init() {
     if [[ "Enforcing" == `getenforce` ]]; then
         sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config && setenforce 0
     fi
+
+    systemctl stop firewalld && systemctl disable firewalld
 }
 
 function install_docker() {
@@ -72,7 +74,8 @@ EOF
     systemctl enable kubelet --now
 
     #所有机器配置master域名
-    echo "`hostname -I` master-cloud.hmc.com" >> /etc/hosts
+    echo "`hostname -I|awk '{print$1}'` master-cloud.hmc.com" >> /etc/hosts
+    echo "`hostname` node`hostname|awk -F '-' '{print$3}'`-cloud.hmc.com" >> /etc/hosts
 }
 
 system_init
