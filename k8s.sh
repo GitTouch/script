@@ -85,7 +85,7 @@ function init_master() {
     echo "init master"
     kubeadm init \
     --apiserver-advertise-address= \
-    --control-plane-endpoint=master-cluod.hmc.com \
+    --control-plane-endpoint=master-cloud.hmc.com \
     --image-repository registry.aliyuncs.com/google_containers \
     --kubernetes-version v1.20.9 \
     --service-cidr=10.96.1.0/24 \
@@ -94,7 +94,7 @@ function init_master() {
 
 function join_cluster() {
     echo "join cluster"
-    kubeadm join master-cluod.hmc.com:6443 --token  \
+    kubeadm join master-cloud.hmc.com:6443 --token  \
     --discovery-token-ca-cert-hash sha256:
 }
 
