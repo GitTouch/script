@@ -7,14 +7,19 @@ function system_init() {
          -e 's|^#baseurl=http://mirror.centos.org/centos|baseurl=https://mirrors.ustc.edu.cn/centos|g' \
          -i.bak \
          /etc/yum.repos.d/CentOS-Base.repo
-        yum makecache && yum update -y && yum install epel-release && yum makecache
+        yum makecache && yum update -y && yum install epel-release -y \
+        && yum makecache
         yum install net-tools lsof yum-utils device-mapper-persistent-data lvm2 vim htop -y
-        #配置docker源仓库
-        yum-config-manager --add-repo https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo && yum makecache
+    fi
+    #配置docker源仓库
+    if [[ ! -e /etc/yum.repos.d/docker-ce.repo ]]; then
+        yum-config-manager --add-repo https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo \
+        && yum makecache
     fi
     #关闭SELinux
     if [[ "Enforcing" == `getenforce` ]]; then
-        sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config && setenforce 0
+        sed -i 's/^SELINUX=enforcing$/SELINUX=disabled/' /etc/selinux/config \
+        && setenforce 0
     fi
     #关闭并禁用防火墙
     systemctl stop firewalld && systemctl disable firewalld
